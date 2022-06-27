@@ -1,0 +1,11 @@
+{
+  "name": "veterinary-gateway",
+  "description": "A microservice that acts as a router.",
+  "repository": {},
+  "license": "UNLICENSED",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "express-gateway": "^1.16.11"
+  }
+}
