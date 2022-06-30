@@ -6,6 +6,8 @@
   "version": "1.0.0",
   "main": "server.js",
   "dependencies": {
-    "express-gateway": "^1.16.11"
+    "express": "^4.18.1",
+    "express-gateway": "^1.16.11",
+    "redis-om": "^0.3.5"
   }
 }
