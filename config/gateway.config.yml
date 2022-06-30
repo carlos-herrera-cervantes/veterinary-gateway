@@ -7,26 +7,107 @@ apiEndpoints:
   api:
     host: ${API_HOST}
     paths: '/ip'
+  
+  # PUBLIC REGION
+  publicAuthorizer:
+    host: ${INTERNAL_HOST}
+    paths:
+      - /authentication/sign-in
+      - /authentication/sign-up/customers
+
+  # EMPLOYEE REGION
+  employeeAuthorizer:
+    host: ${INTERNAL_HOST}
+    paths:
+      - /authentication/sign-up/employees
+
+  # ALL REGION
+  authorizer:
+    host: ${INTERNAL_HOST}
+    paths:
+      - /authentication/sign-out
+
 serviceEndpoints:
   httpbin:
     url: 'https://httpbin.org'
+  authorizerService:
+    url: ${AUTHORIZER_URL}
 policies:
-  - basic-auth
-  - cors
-  - expression
-  - key-auth
   - log
-  - oauth2
   - proxy
-  - rate-limit
+  - jwt
+  - request-transformer
+  - jwt-validator
 pipelines:
   default:
     apiEndpoints:
       - api
     policies:
-    # Uncomment `key-auth:` when instructed to in the Getting Started guide.
-    # - key-auth:
       - proxy:
           - action:
               serviceEndpoint: httpbin 
+              changeOrigin: true
+  
+  # PUBLIC REGION
+  publicAuthorizerPipeline:
+    apiEndpoints:
+      - publicAuthorizer
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: authorizerService
+              changeOrigin: true
+  
+  # EMPLOYEE REGION
+  employeeAuthorizerPipeline:
+    apiEndpoints:
+      - employeeAuthorizer
+    policies:
+      - jwt:
+          - action:
+              secretOrPublicKey: ${SECRET_KEY}
+              checkCredentialExistence: false
+      - request-transformer:
+          - action:
+              headers:
+                add:
+                  user-id: req.user.nameid
+          - action:
+              headers:
+                add:
+                  user-email: req.user.email
+          - action:
+              headers:
+                add:
+                  user-roles: req.user.role
+      - proxy:
+          - action:
+              serviceEndpoint: authorizerService
+              changeOrigin: true
+  
+  # ALL REGION
+  authorizerPipeline:
+    apiEndpoints:
+      - authorizer
+    policies:
+      - jwt:
+          - action:
+              secretOrPublicKey: ${SECRET_KEY}
+              checkCredentialExistence: false
+      - request-transformer:
+          - action:
+              headers:
+                add:
+                  user-id: req.user.nameid
+          - action:
+              headers:
+                add:
+                  user-email: req.user.email
+          - action:
+              headers:
+                add:
+                  user-roles: req.user.role
+      - proxy:
+          - action:
+              serviceEndpoint: authorizerService
               changeOrigin: true
