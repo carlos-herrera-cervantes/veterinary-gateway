@@ -10,7 +10,7 @@ module.exports = {
     const client = await Redis.connect();
 
     const sessionJwt = await client.get(`jwt:${userEmail}`);
-    const trustedJwt = jwt == sessionJwt;
+    const trustedJwt = jwt == sessionJwt.replace(/"/g, '');
 
     return trustedJwt ? next() : res.status(403).send();
   }
