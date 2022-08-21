@@ -30,6 +30,7 @@ apiEndpoints:
       - /employees/address
       - /employees/address/me
       - /employees/avatar
+      - /employees/avatar/:id
       - /employees/avatar/me
   
   # PUBLIC REGION
