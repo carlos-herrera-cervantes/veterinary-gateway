@@ -45,6 +45,7 @@ apiEndpoints:
     host: ${INTERNAL_HOST}
     paths:
       - /authentication/sign-up/employees
+      - /authentication/account/lock
 
   employeeCustomer:
     host: ${INTERNAL_HOST}
