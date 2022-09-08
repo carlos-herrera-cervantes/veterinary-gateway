@@ -30,3 +30,5 @@ plugins:
     package: "../../../policies/manifest.js"
   role-validator:
     package: "../../../policies/manifest.js"
+  endpoint-guard:
+    package: "../../../policies/manifest.js"
