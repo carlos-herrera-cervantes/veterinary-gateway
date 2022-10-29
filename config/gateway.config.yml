@@ -8,13 +8,13 @@ apiEndpoints:
     host: ${API_HOST}
     paths: '/ip'
 
-  # ALL REGION
-  authorizer:
+  # INTERNAL REGION
+  internalAuthorizer:
     host: ${INTERNAL_HOST}
     paths:
       - /authentication/sign-out
 
-  customer:
+  internalCustomer:
     host: ${INTERNAL_HOST}
     paths:
       - /customers/profiles/me
@@ -23,7 +23,7 @@ apiEndpoints:
       - /customers/avatars
       - /customers/avatars/me
 
-  employee:
+  internalEmployee:
     host: ${INTERNAL_HOST}
     paths:
       - /employees/profiles/me
@@ -33,7 +33,7 @@ apiEndpoints:
       - /employees/avatar/:id
       - /employees/avatar/me
 
-  pet:
+  internalPet:
     host: ${INTERNAL_HOST}
     paths:
       - /pets/classifications
@@ -42,6 +42,15 @@ apiEndpoints:
       - /pets/:id/allergies
       - /pets/:id/avatar
       - /pets/:classification_id/allergies/:allergy_id
+
+  internalServices:
+    host: ${INTERNAL_HOST}
+    paths:
+      - /api/services/v1/costs
+      - /api/services/v1/costs/:id
+      - /api/services/v1/customers/me
+      - /api/services/v1/customers/me/:id
+      - /api/services/v1/costs/total
   
   # PUBLIC REGION
   publicAuthorizer:
@@ -50,20 +59,20 @@ apiEndpoints:
       - /authentication/sign-in
       - /authentication/sign-up/customers
 
-  # EMPLOYEE REGION
-  employeeAuthorizer:
+  # PRIVATE REGION
+  privateAuthorizer:
     host: ${INTERNAL_HOST}
     paths:
       - /authentication/sign-up/employees
       - /authentication/account/lock
 
-  employeeCustomer:
+  privateCustomer:
     host: ${INTERNAL_HOST}
     paths:
       - /customers/profiles
       - /customers/profiles/:id
 
-  employeePrivate:
+  privateEmployee:
     host: ${INTERNAL_HOST}
     paths:
       - /employees/profiles
@@ -71,7 +80,16 @@ apiEndpoints:
       - /employees/roles
       - /employees/roles/:id
 
-  petPrivate:
+  privateServices:
+    host: ${INTERNAL_HOST}
+    paths:
+      - /api/services/v1/catalog
+      - /api/services/v1/catalog/:id
+      - /api/services/v1/customers
+      - /api/services/v1/customers/:id
+      - /api/services/v1/customers/:id/employee
+
+  privatePet:
     host: ${INTERNAL_HOST}
     paths:
       - /pets/profiles
@@ -90,6 +108,8 @@ serviceEndpoints:
     url: ${EMPLOYEE_URL}
   petService:
     url: ${PET_URL}
+  servicesService:
+    url: ${SERVICES_URL}
 policies:
   - log
   - proxy
@@ -118,10 +138,10 @@ pipelines:
               serviceEndpoint: authorizerService
               changeOrigin: true
   
-  # EMPLOYEE REGION
-  employeeAuthorizerPipeline:
+  # PRIVATE REGION
+  privateAuthorizerPipeline:
     apiEndpoints:
-      - employeeAuthorizer
+      - privateAuthorizer
     policies:
       - jwt:
           - action:
@@ -140,6 +160,7 @@ pipelines:
               headers:
                 add:
                   user-roles: req.user.role
+      - jwt-validator:
       - role-validator:
           - action:
               roles: SuperAdmin,Employee
@@ -147,9 +168,9 @@ pipelines:
           - action:
               serviceEndpoint: authorizerService
               changeOrigin: true
-  employeeCustomerPipeline:
+  privateCustomerPipeline:
     apiEndpoints:
-      - employeeCustomer
+      - privateCustomer
     policies:
       - jwt:
           - action:
@@ -168,6 +189,7 @@ pipelines:
               headers:
                 add:
                   user-roles: req.user.role
+      - jwt-validator:
       - role-validator:
           - action:
               roles: SuperAdmin,Employee
@@ -175,9 +197,9 @@ pipelines:
           - action:
               serviceEndpoint: customerService
               changeOrigin: true
-  employeePrivatePipeline:
+  privateEmployeePipeline:
     apiEndpoints:
-      - employeePrivate
+      - privateEmployee
     policies:
       - jwt:
           - action:
@@ -196,6 +218,7 @@ pipelines:
               headers:
                 add:
                   user-roles: req.user.role
+      - jwt-validator:
       - role-validator:
           - action:
               roles: SuperAdmin
@@ -203,9 +226,9 @@ pipelines:
           - action:
               serviceEndpoint: employeeService
               changeOrigin: true
-  petPrivatePipeline:
+  privatePetPipeline:
     apiEndpoints:
-      - petPrivate
+      - privatePet
     policies:
       - jwt:
           - action:
@@ -224,18 +247,17 @@ pipelines:
               headers:
                 add:
                   user-roles: req.user.role
+      - jwt-validator:
       - role-validator:
           - action:
               roles: SuperAdmin,Employee
       - proxy:
           - action:
-              serviceEndpoint: employeeService
+              serviceEndpoint: petService
               changeOrigin: true
-
-  # ALL REGION
-  authorizerPipeline:
+  privateServicesPipeline:
     apiEndpoints:
-      - authorizer
+      - privateServices
     policies:
       - jwt:
           - action:
@@ -254,13 +276,45 @@ pipelines:
               headers:
                 add:
                   user-roles: req.user.role
+      - jwt-validator:
+      - role-validator:
+          - action:
+              roles: SuperAdmin,Employee
+      - proxy:
+          - action:
+              serviceEndpoint: servicesService
+              changeOrigin: true
+
+  # INTERNAL REGION
+  internalAuthorizerPipeline:
+    apiEndpoints:
+      - internalAuthorizer
+    policies:
+      - jwt:
+          - action:
+              secretOrPublicKey: ${SECRET_KEY}
+              checkCredentialExistence: false
+      - request-transformer:
+          - action:
+              headers:
+                add:
+                  user-id: req.user.nameid
+          - action:
+              headers:
+                add:
+                  user-email: req.user.email
+          - action:
+              headers:
+                add:
+                  user-roles: req.user.role
+      - jwt-validator:
       - proxy:
           - action:
               serviceEndpoint: authorizerService
               changeOrigin: true
-  customerPipeline:
+  internalCustomerPipeline:
     apiEndpoints:
-      - customer
+      - internalCustomer
     policies:
       - jwt:
           - action:
@@ -284,9 +338,9 @@ pipelines:
           - action:
               serviceEndpoint: customerService
               changeOrigin: true   
-  employeePipeline:
+  internalEmployeePipeline:
     apiEndpoints:
-      - employee
+      - internalEmployee
     policies:
       - jwt:
           - action:
@@ -305,6 +359,7 @@ pipelines:
               headers:
                 add:
                   user-roles: req.user.role
+      - jwt-validator:
       - role-validator:
           - action:
               roles: SuperAdmin,Employee
@@ -312,9 +367,9 @@ pipelines:
           - action:
               serviceEndpoint: employeeService
               changeOrigin: true
-  petPipeline:
+  internalpetPipeline:
     apiEndpoints:
-      - pet
+      - internalPet
     policies:
       - jwt:
           - action:
@@ -333,6 +388,7 @@ pipelines:
               headers:
                 add:
                   user-roles: req.user.role
+      - jwt-validator:
       - role-validator:
           - action:
               roles: SuperAdmin,Employee,Customer
@@ -347,4 +403,38 @@ pipelines:
       - proxy:
           - action:
               serviceEndpoint: petService
+              changeOrigin: true
+  internalServicesPipeline:
+    apiEndpoints:
+      - internalServices
+    policies:
+      - jwt:
+          - action:
+              secretOrPublicKey: ${SECRET_KEY}
+              checkCredentialExistence: false
+      - request-transformer:
+          - action:
+              headers:
+                add:
+                  user-id: req.user.nameid
+          - action:
+              headers:
+                add:
+                  user-email: req.user.email
+          - action:
+              headers:
+                add:
+                  user-roles: req.user.role
+      - jwt-validator:
+      - endpoint-guard:
+          - action:
+              roles: Customer
+              endpoints:
+                - regex: \/api\/services\/v1\/costs$
+                  methods: GET
+                - regex: \/api\/services\/v1\/costs\/[a-fA-F0-9]{24}$
+                  methods: GET
+      - proxy:
+          - action:
+              serviceEndpoint: servicesService
               changeOrigin: true
