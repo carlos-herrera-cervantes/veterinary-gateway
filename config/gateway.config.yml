@@ -50,6 +50,7 @@ apiEndpoints:
       - /api/services/v1/costs/:id
       - /api/services/v1/customers/me
       - /api/services/v1/customers/me/:id
+      - /api/services/v1/customers/me/:id/cancel
       - /api/services/v1/costs/total
   
   # PUBLIC REGION
