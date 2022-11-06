@@ -52,6 +52,18 @@ apiEndpoints:
       - /api/services/v1/customers/me/:id
       - /api/services/v1/customers/me/:id/cancel
       - /api/services/v1/costs/total
+
+  internalPayments:
+    host: ${INTERNAL_HOST}
+    paths:
+      - /api/payments/v1/bank-accounts/me
+      - /api/payments/v1/cards/me
+      - /api/payments/v1/cards/me/:id
+      - /api/payments/v1/devolutions/me
+      - /api/payments/v1/devolutions/me
+      - /api/payments/v1/devolutions/me/:id
+      - /api/payments/v1/methods
+      - /api/payments/v1/methods/:id
   
   # PUBLIC REGION
   publicAuthorizer:
@@ -98,6 +110,18 @@ apiEndpoints:
       - /pets/classifications/:classification_id/races/:race_id
       - /pets/classifications/:id
 
+  privatePayments:
+    host: ${INTERNAL_HOST}
+    paths:
+      - /api/payments/v1/bank-accounts
+      - /api/payments/v1/bank-accounts/:id
+      - /api/payments/v1/cards
+      - /api/payments/v1/cards/:id
+      - /api/payments/v1/devolutions
+      - /api/payments/v1/devolutions/:id
+      - /api/payments/v1/transactions
+      - /api/payments/v1/transactions/:id
+
 serviceEndpoints:
   httpbin:
     url: 'https://httpbin.org'
@@ -111,6 +135,8 @@ serviceEndpoints:
     url: ${PET_URL}
   servicesService:
     url: ${SERVICES_URL}
+  paymentsService:
+    url: ${PAYMENTS_URL}
 policies:
   - log
   - proxy
@@ -285,6 +311,35 @@ pipelines:
           - action:
               serviceEndpoint: servicesService
               changeOrigin: true
+  privatePaymentsPipeline:
+    apiEndpoints:
+      - privatePayments
+    policies:
+      - jwt:
+          - action:
+              secretOrPublicKey: ${SECRET_KEY}
+              checkCredentialExistence: false
+      - request-transformer:
+          - action:
+              headers:
+                add:
+                  user-id: req.user.nameid
+          - action:
+              headers:
+                add:
+                  user-email: req.user.email
+          - action:
+              headers:
+                add:
+                  user-roles: req.user.role
+      - jwt-validator:
+      - role-validator:
+          - action:
+              roles: SuperAdmin,Employee
+      - proxy:
+          - action:
+              serviceEndpoint: paymentsService
+              changeOrigin: true
 
   # INTERNAL REGION
   internalAuthorizerPipeline:
@@ -438,4 +493,38 @@ pipelines:
       - proxy:
           - action:
               serviceEndpoint: servicesService
+              changeOrigin: true
+  internalPaymentsPipeline:
+    apiEndpoints:
+      - internalPayments
+    policies:
+      - jwt:
+          - action:
+              secretOrPublicKey: ${SECRET_KEY}
+              checkCredentialExistence: false
+      - request-transformer:
+          - action:
+              headers:
+                add:
+                  user-id: req.user.nameid
+          - action:
+              headers:
+                add:
+                  user-email: req.user.email
+          - action:
+              headers:
+                add:
+                  user-roles: req.user.role
+      - jwt-validator:
+      - endpoint-guard:
+          - action:
+              roles: Customer
+              endpoints:
+                - regex: \/api\/payments\/v1\/methods$
+                  methods: GET
+                - regex: \/api\/payments\/v1\/methods\/[a-fA-F0-9]{24}$
+                  methods: GET
+      - proxy:
+          - action:
+              serviceEndpoint: paymentsService
               changeOrigin: true
