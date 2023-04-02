@@ -12,115 +12,115 @@ apiEndpoints:
   internalAuthorizer:
     host: ${INTERNAL_HOST}
     paths:
-      - /authentication/sign-out
+      - ${AUTHORIZER_BASE_PATH_V1}/sign-out
 
   internalCustomer:
     host: ${INTERNAL_HOST}
     paths:
-      - /customers/profiles/me
-      - /customers/address
-      - /customers/address/me
-      - /customers/avatars
-      - /customers/avatars/me
+      - ${CUSTOMER_BASE_PATH_V1}/profiles/me
+      - ${CUSTOMER_BASE_PATH_V1}/address
+      - ${CUSTOMER_BASE_PATH_V1}/address/me
+      - ${CUSTOMER_BASE_PATH_V1}/avatar
+      - ${CUSTOMER_BASE_PATH_V1}/avatar/me
 
   internalEmployee:
     host: ${INTERNAL_HOST}
     paths:
-      - /employees/profiles/me
-      - /employees/address
-      - /employees/address/me
-      - /employees/avatar
-      - /employees/avatar/:id
-      - /employees/avatar/me
+      - ${EMPLOYEE_BASE_PATH_V1}/profiles/me
+      - ${EMPLOYEE_BASE_PATH_V1}/address
+      - ${EMPLOYEE_BASE_PATH_V1}/address/me
+      - ${EMPLOYEE_BASE_PATH_V1}/avatar
+      - ${EMPLOYEE_BASE_PATH_V1}/avatar/:id
+      - ${EMPLOYEE_BASE_PATH_V1}/avatar/me
 
   internalPet:
     host: ${INTERNAL_HOST}
     paths:
-      - /pets/classifications
-      - /pets/profiles/me
-      - /pets/classifications/:id/races
-      - /pets/:id/allergies
-      - /pets/:id/avatar
-      - /pets/:classification_id/allergies/:allergy_id
+      - ${PET_BASE_PATH_V1}/classifications
+      - ${PET_BASE_PATH_V1}/profiles/me
+      - ${PET_BASE_PATH_V1}/classifications/:id/races
+      - ${PET_BASE_PATH_V1}/:id/allergies
+      - ${PET_BASE_PATH_V1}/:id/avatar
+      - ${PET_BASE_PATH_V1}/:classification_id/allergies/:allergy_id
 
   internalServices:
     host: ${INTERNAL_HOST}
     paths:
-      - /api/services/v1/costs
-      - /api/services/v1/costs/:id
-      - /api/services/v1/customers/me
-      - /api/services/v1/customers/me/:id
-      - /api/services/v1/customers/me/:id/cancel
-      - /api/services/v1/costs/total
+      - ${SERVICES_BASE_PATH_V1}/costs
+      - ${SERVICES_BASE_PATH_V1}/costs/:id
+      - ${SERVICES_BASE_PATH_V1}/customers/me
+      - ${SERVICES_BASE_PATH_V1}/customers/me/:id
+      - ${SERVICES_BASE_PATH_V1}/customers/me/:id/cancel
+      - ${SERVICES_BASE_PATH_V1}/costs/total
 
   internalPayments:
     host: ${INTERNAL_HOST}
     paths:
-      - /api/payments/v1/bank-accounts/me
-      - /api/payments/v1/cards/me
-      - /api/payments/v1/cards/me/:id
-      - /api/payments/v1/devolutions/me
-      - /api/payments/v1/devolutions/me
-      - /api/payments/v1/devolutions/me/:id
-      - /api/payments/v1/methods
-      - /api/payments/v1/methods/:id
+      - ${PAYMENTS_BASE_PATH_V1}/bank-accounts/me
+      - ${PAYMENTS_BASE_PATH_V1}/cards/me
+      - ${PAYMENTS_BASE_PATH_V1}/cards/me/:id
+      - ${PAYMENTS_BASE_PATH_V1}/devolutions/me
+      - ${PAYMENTS_BASE_PATH_V1}/devolutions/me
+      - ${PAYMENTS_BASE_PATH_V1}/devolutions/me/:id
+      - ${PAYMENTS_BASE_PATH_V1}/methods
+      - ${PAYMENTS_BASE_PATH_V1}/methods/:id
   
   # PUBLIC REGION
   publicAuthorizer:
     host: ${INTERNAL_HOST}
     paths:
-      - /authentication/sign-in
-      - /authentication/sign-up/customers
+      - ${AUTHORIZER_BASE_PATH_V1}/sign-in
+      - ${AUTHORIZER_BASE_PATH_V1}/customers
 
   # PRIVATE REGION
   privateAuthorizer:
     host: ${INTERNAL_HOST}
     paths:
-      - /authentication/sign-up/employees
-      - /authentication/account/lock
+      - ${AUTHORIZER_BASE_PATH_V1}/sign-up/employees
+      - ${AUTHORIZER_BASE_PATH_V1}/account/lock
 
   privateCustomer:
     host: ${INTERNAL_HOST}
     paths:
-      - /customers/profiles
-      - /customers/profiles/:id
+      - ${CUSTOMER_BASE_PATH_V1}/profiles
+      - ${CUSTOMER_BASE_PATH_V1}/profiles/:id
 
   privateEmployee:
     host: ${INTERNAL_HOST}
     paths:
-      - /employees/profiles
-      - /employees/profiles/:id
-      - /employees/roles
-      - /employees/roles/:id
+      - ${EMPLOYEE_BASE_PATH_V1}/profiles
+      - ${EMPLOYEE_BASE_PATH_V1}/profiles/:id
+      - ${EMPLOYEE_BASE_PATH_V1}/roles
+      - ${EMPLOYEE_BASE_PATH_V1}/roles/:id
 
   privateServices:
     host: ${INTERNAL_HOST}
     paths:
-      - /api/services/v1/catalog
-      - /api/services/v1/catalog/:id
-      - /api/services/v1/customers
-      - /api/services/v1/customers/:id
-      - /api/services/v1/customers/:id/employee
+      - ${SERVICES_BASE_PATH_V1}/catalog
+      - ${SERVICES_BASE_PATH_V1}/catalog/:id
+      - ${SERVICES_BASE_PATH_V1}/customers
+      - ${SERVICES_BASE_PATH_V1}/customers/:id
+      - ${SERVICES_BASE_PATH_V1}/customers/:id/employee
 
   privatePet:
     host: ${INTERNAL_HOST}
     paths:
-      - /pets/profiles
-      - /pets/profiles/:id
-      - /pets/classifications/:classification_id/races/:race_id
-      - /pets/classifications/:id
+      - ${PET_BASE_PATH_V1}/profiles
+      - ${PET_BASE_PATH_V1}/profiles/:id
+      - ${PET_BASE_PATH_V1}/classifications/:classification_id/races/:race_id
+      - ${PET_BASE_PATH_V1}/classifications/:id
 
   privatePayments:
     host: ${INTERNAL_HOST}
     paths:
-      - /api/payments/v1/bank-accounts
-      - /api/payments/v1/bank-accounts/:id
-      - /api/payments/v1/cards
-      - /api/payments/v1/cards/:id
-      - /api/payments/v1/devolutions
-      - /api/payments/v1/devolutions/:id
-      - /api/payments/v1/transactions
-      - /api/payments/v1/transactions/:id
+      - ${PAYMENTS_BASE_PATH_V1}/bank-accounts
+      - ${PAYMENTS_BASE_PATH_V1}/bank-accounts/:id
+      - ${PAYMENTS_BASE_PATH_V1}/cards
+      - ${PAYMENTS_BASE_PATH_V1}/cards/:id
+      - ${PAYMENTS_BASE_PATH_V1}/devolutions
+      - ${PAYMENTS_BASE_PATH_V1}/devolutions/:id
+      - ${PAYMENTS_BASE_PATH_V1}/transactions
+      - ${PAYMENTS_BASE_PATH_V1}/transactions/:id
 
 serviceEndpoints:
   httpbin:
