@@ -38,6 +38,7 @@ apiEndpoints:
     paths:
       - ${PET_BASE_PATH_V1}/classifications
       - ${PET_BASE_PATH_V1}/profiles/me
+      - ${PET_BASE_PATH_V1}/profiles/:id/me
       - ${PET_BASE_PATH_V1}/classifications/:id/races
       - ${PET_BASE_PATH_V1}/:id/allergies
       - ${PET_BASE_PATH_V1}/:id/avatar
@@ -70,7 +71,7 @@ apiEndpoints:
     host: ${INTERNAL_HOST}
     paths:
       - ${AUTHORIZER_BASE_PATH_V1}/sign-in
-      - ${AUTHORIZER_BASE_PATH_V1}/customers
+      - ${AUTHORIZER_BASE_PATH_V1}/sign-up/customers
 
   # PRIVATE REGION
   privateAuthorizer:
@@ -107,6 +108,7 @@ apiEndpoints:
     paths:
       - ${PET_BASE_PATH_V1}/profiles
       - ${PET_BASE_PATH_V1}/profiles/:id
+      - ${PET_BASE_PATH_V1}/profiles/:id/customer
       - ${PET_BASE_PATH_V1}/classifications/:classification_id/races/:race_id
       - ${PET_BASE_PATH_V1}/classifications/:id
 
@@ -190,7 +192,7 @@ pipelines:
       - jwt-validator:
       - role-validator:
           - action:
-              roles: SuperAdmin,Employee
+              roles: SuperAdmin,Admin,Employee
       - proxy:
           - action:
               serviceEndpoint: authorizerService
@@ -219,7 +221,7 @@ pipelines:
       - jwt-validator:
       - role-validator:
           - action:
-              roles: SuperAdmin,Employee
+              roles: SuperAdmin,Admin,Employee
       - proxy:
           - action:
               serviceEndpoint: customerService
@@ -248,7 +250,7 @@ pipelines:
       - jwt-validator:
       - role-validator:
           - action:
-              roles: SuperAdmin
+              roles: SuperAdmin,Admin
       - proxy:
           - action:
               serviceEndpoint: employeeService
@@ -277,7 +279,7 @@ pipelines:
       - jwt-validator:
       - role-validator:
           - action:
-              roles: SuperAdmin,Employee
+              roles: SuperAdmin,Admin,Employee
       - proxy:
           - action:
               serviceEndpoint: petService
@@ -447,7 +449,7 @@ pipelines:
       - jwt-validator:
       - role-validator:
           - action:
-              roles: SuperAdmin,Employee,Customer
+              roles: SuperAdmin,Admin,Employee,Customer
       - endpoint-guard:
           - action:
               roles: Employee
